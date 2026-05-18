@@ -1,0 +1,480 @@
+{
+  "name": "FAQ-Lead-Agent-WhatsApp (Template)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        -16
+      ],
+      "id": "961dfdfd-cda6-4414-b528-c7c2a1d623f2",
+      "name": "WhatsApp Trigger",
+      "webhookId": "TU_WEBHOOK_ID_TRIGGER",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "CONFIGURAR_EN_N8N",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mensaje }}",
+        "options": {
+          "systemMessage": "Sos el asistente virtual de [NOMBRE_TIENDA], una tienda de indumentaria con dos locales en Buenos Aires. Tu nombre es \"Asistente de [NOMBRE_TIENDA]\".\n\n🎭 PERSONALIDAD:\nHablás como un vendedor porteño real: directo, simpático, natural. Usás \"vos\". Máximo 1 emoji por mensaje. NUNCA uses frases como \"¡Estoy aquí para ayudarte!\", \"¡Listo para lo que necesites!\" o cualquier cosa que suene a chatbot o a traducción del inglés.\n\n🏪 LOCALES:\n- Av. Cramer 1855, Belgrano | Lunes a viernes de 10 a 20hs, sábados de 10 a 14hs.\n- Av. Juramento 2568, Belgrano | Lunes a sábados de 10 a 20hs.\n- Feriados: depende el feriado, consultá antes de venir\n\nCuando des horarios, escribilos en texto corrido, sin viñetas ni listas. Ejemplo: \"Av. Cramer abre: lunes a viernes de 10 a 20hs y sábados hasta las 14hs. Av. Juramento abre lunes a sábados de 10 a 20hs.\"\n\n💳 MEDIOS DE PAGO:\n- Efectivo o transferencia: 20% de descuento\n- Mercado Pago y todas las tarjetas de crédito\n- 3 cuotas sin interés con tarjeta de crédito\n\n🚚 ENVÍOS: Sí hacemos envíos, el costo se coordina por este medio.\n\n📦 STOCK: El mismo en ambos locales.\n\n🎯 TU OBJETIVO:\nCalificar al cliente recopilando estos 3 datos:\n1. Qué tipo de prenda busca\n2. Talle\n3. Color preferido\n\nHacelo de forma natural, no como un formulario. Podés preguntar los 3 juntos o de a uno según el contexto.\n\n✅ CUANDO TENGAS LOS 3 DATOS:\nRespondé EXACTAMENTE con este mensaje, sin modificarlo ni agregarle nada:\n\"¡Perfecto! 🙌 Ya tengo todo lo que necesito. Te paso con una de nuestras vendedoras que te confirma disponibilidad y te ayuda a cerrar la compra. ¡En breve te contactan!\"\n\nLuego agregá al final (sin markdown, sin backticks):\nLEAD_DATA:{\"prenda\":\"valor\",\"talle\":\"valor\",\"color\":\"valor\",\"resumen\":\"resumen breve en una línea\"}\n\n⚠️ DERIVAR A HUMANO:\nSi el cliente quiere probarse algo o pide fotos de colores:\n1. Respondé brevemente cualquier pregunta puntual que haya hecho (horarios, dirección, etc.)\n2. Cerrá SIEMPRE con EXACTAMENTE este texto, sin modificarlo ni agregarle nada:\n\"¡Genial! 🙌 Dejame pasarte con una de nuestras vendedoras que te va a ayudar mejor. En breve te contactan 😊\"\n3. NO agregues nada después de esa frase.\n\n❌ NO hacemos venta mayorista."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "b5dd4b8b-dcb2-46b3-b333-adb29475ee60",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "b650ad0f-cfe1-416f-a5c1-c5288551bc00",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "CONFIGURAR_EN_N8N",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.telefono }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "7ffbca86-d6af-439e-ba76-86837e988489",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "CONFIGURAR_EN_N8N",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "=TU_PHONE_NUMBER_ID",
+        "recipientPhoneNumber": "=NUMERO_DESTINO_PRUEBA",
+        "textBody": "={{ $('Code in JavaScript').item.json.mensaje }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        0
+      ],
+      "id": "611ddecf-f037-43d7-bb1e-c9d51523756a",
+      "name": "Send message",
+      "webhookId": "TU_WEBHOOK_ID_SEND",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "CONFIGURAR_EN_N8N",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "TU_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Leads WhatsApp [NOMBRE_TIENDA]",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/TU_GOOGLE_SHEET_ID/edit"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/TU_GOOGLE_SHEET_ID/edit"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $json.fecha }}",
+            "Telefono": "={{ $json.telefono }}",
+            "Prenda": "={{ $json.prenda }}",
+            "Talle": "={{ $json.talle }}",
+            "Color": "={{ $json.color }}",
+            "Resumen": "={{ $json.resumen }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Telefono",
+              "displayName": "Telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Prenda",
+              "displayName": "Prenda",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Talle",
+              "displayName": "Talle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Color",
+              "displayName": "Color",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Resumen",
+              "displayName": "Resumen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        208
+      ],
+      "id": "dfcee451-869b-491f-870f-a5d7ad68cab4",
+      "name": "Append row in sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CONFIGURAR_EN_N8N",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $('AI Agent').item.json.output;\n\nconst match = output.match(/LEAD_DATA:(\\{.*\\})/);\n\nif (match) {\n  const leadData = JSON.parse(match[1]);\n  const mensaje = output.replace(/LEAD_DATA:\\{.*\\}/, '').trim();\n  const leadCompleto = leadData.prenda && leadData.talle && leadData.color;\n\n  return [{\n    json: {\n      prenda: leadData.prenda || '',\n      talle: leadData.talle || '',\n      color: leadData.color || '',\n      resumen: leadData.resumen || '',\n      telefono: $('Edit Fields').item.json.telefono,\n      fecha: new Date().toISOString(),\n      mensaje: mensaje,\n      guardar_en_sheets: leadCompleto ? true : false\n    }\n  }];\n} else {\n  return [{\n    json: {\n      prenda: '',\n      talle: '',\n      color: '',\n      resumen: '',\n      telefono: $('Edit Fields').item.json.telefono,\n      fecha: new Date().toISOString(),\n      mensaje: output,\n      guardar_en_sheets: false\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "d0775919-19b3-46ff-87f9-0e28e805a46c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3f2cbf09-1eea-4ba9-9d71-7167969cbefe",
+              "leftValue": "={{ $json.guardar_en_sheets }}",
+              "rightValue": "is true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        704,
+        224
+      ],
+      "id": "53a00c93-8f17-430f-b3cb-911ba0f33c97",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c252e8dd-1040-4371-a571-9eb2f4c4fcb2",
+              "name": "telefono",
+              "value": "={{ $json.contacts[0].wa_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e4b57120-6ef0-46cd-aa1a-6fa333181d85",
+              "name": "mensaje",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d630037e-faf9-44e4-974e-6a39e9cee496",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        672,
+        368
+      ],
+      "id": "0d47d24e-13e7-49cf-a83f-58b0a2fdaeb3",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f66d6e3d-1876-4362-8136-97e50dec055a",
+              "leftValue": "={{ $json.messages[0].from }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "ef2cdcc9-575e-44e3-89cf-95f092dcc81e",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        256
+      ],
+      "id": "440d9e48-6cc0-470b-8630-70f60870c493",
+      "name": "No Operation, do nothing1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "TU_INSTANCE_ID"
+  },
+  "tags": []
+}
