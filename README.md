@@ -144,6 +144,4 @@ The project demonstrates applied AI agent design, structured output parsing, mul
 
 ## Author
 
-**Fabricio Rafael Garrido Guzmán**
-Automation Developer — n8n · AI Agents · Workflow Integrations
-[LinkedIn](https://www.linkedin.com/in/fabricio-garrido) · [GitHub](https://github.com/fabriciogarrido)
+Built by **Fabricio Garrido** — [LinkedIn](https://linkedin.com/in/fabriciogarrido) · [GitHub](https://github.com/fabrogarrido)
