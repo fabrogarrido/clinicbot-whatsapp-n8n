@@ -144,6 +144,4 @@ El proyecto demuestra diseño aplicado de agentes de IA, parseo de output estruc
 
 ## Autor
 
-**Fabricio Rafael Garrido Guzmán**
-Automation Developer — n8n · Agentes de IA · Integraciones de flujos
-[LinkedIn](https://www.linkedin.com/in/fabricio-garrido) · [GitHub](https://github.com/fabriciogarrido)
+Desarrollado por **Fabricio Garrido** — [LinkedIn](https://linkedin.com/in/fabriciogarrido) · [GitHub](https://github.com/fabrogarrido)
